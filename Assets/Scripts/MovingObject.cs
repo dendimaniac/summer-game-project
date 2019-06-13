@@ -30,6 +30,12 @@ public abstract class MovingObject : MonoBehaviour
         isPlayerTurn = true;
     }
 
+    protected void OnCollisionEnter2D(Collision2D other) {
+        if (other.gameObject.layer != 8) {
+            Debug.Log("You lost");
+        }
+    }
+
 
     //Move returns true if it is able to move and false if not. 
     //Move takes parameters for x direction, y direction and a RaycastHit2D to check collision.
@@ -89,6 +95,9 @@ public abstract class MovingObject : MonoBehaviour
             //Return and loop until sqrRemainingDistance is close enough to zero to end the function
             yield return null;
         }
+        // SaveSystem.SavePos(transform.position);
+        //Debug.Log("MovingObj " + SaveSystem.LoadPos().positionList[0][0] + SaveSystem.LoadPos().positionList[0][0]);
+        // posTracks.AddNewPos(transform.position);
         isPlayerTurn = true;
     }
 
@@ -104,9 +113,9 @@ public abstract class MovingObject : MonoBehaviour
         bool canMove = Move(xDir, yDir, out hit);
 
         //Check if nothing was hit by linecast
-        if (hit.transform == null)
-            //If nothing was hit, return and don't execute further code.
-            return;
+        // if (hit.transform == null)
+        //     //If nothing was hit, return and don't execute further code.
+        //     return;
 
         //Get a component reference to the component of type T attached to the object that was hit
         // T hitComponent = hit.transform.GetComponent<T>();
@@ -114,8 +123,8 @@ public abstract class MovingObject : MonoBehaviour
         //If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
         // if (!canMove && hitComponent != null)
 
-            //Call the OnCantMove function and pass it hitComponent as a parameter.
-            // OnCantMove(hitComponent);
+        //Call the OnCantMove function and pass it hitComponent as a parameter.
+        // OnCantMove(hitComponent);
     }
 
 

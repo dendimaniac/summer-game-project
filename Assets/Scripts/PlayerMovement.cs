@@ -5,15 +5,15 @@ using UnityEngine.SceneManagement;        //Allows us to use SceneManager
 //Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
 public class PlayerMovement : MovingObject
 {
-    public float restartLevelDelay = 1f;        //Delay time in seconds to restart level.
-    public int pointsPerFood = 10;                //Number of points to add to player food points when picking up a food object.
-    public int pointsPerSoda = 20;                //Number of points to add to player food points when picking up a soda object.
+    // public float restartLevelDelay = 1f;        //Delay time in seconds to restart level.
+    // public int pointsPerFood = 10;                //Number of points to add to player food points when picking up a food object.
+    // public int pointsPerSoda = 20;                //Number of points to add to player food points when picking up a soda object.
     // public int wallDamage = 1;                    //How much damage a player does to a wall when chopping it.
-
+    private Vector3 lastPosition;
+    public PlayerPos posTracks;
 
     // private Animator animator;                    //Used to store a reference to the Player's animator component.
-    private int food;                            //Used to store player food points total during level.
-
+    // private int food;                            //Used to store player food points total during level.
 
     //Start overrides the Start function of MovingObject
     protected override void Start()
@@ -26,6 +26,7 @@ public class PlayerMovement : MovingObject
 
         //Call the Start function of the MovingObject base class.
         base.Start();
+        posTracks.AddNewPos(transform.position);
     }
 
 
@@ -42,6 +43,11 @@ public class PlayerMovement : MovingObject
         //If it's not the player's turn, exit the function.
         if (!base.isPlayerTurn) return;
 
+        if (transform.position != lastPosition)
+        {
+            lastPosition = transform.position;
+            posTracks.AddNewPos(transform.position);
+        }
         int horizontal = 0;      //Used to store the horizontal move direction.
         int vertical = 0;        //Used to store the vertical move direction.
 
@@ -60,7 +66,7 @@ public class PlayerMovement : MovingObject
         //Check if we have a non-zero value for horizontal or vertical
         if (horizontal != 0 || vertical != 0)
         {
-            Debug.Log(horizontal + " + " + vertical);
+            base.isPlayerTurn = false;
             AttemptMove(horizontal, vertical);
             //Call AttemptMove passing in the generic parameter Wall, since that is what Player may interact with if they encounter one (by attacking it)
             //Pass in horizontal and vertical as parameters to specify the direction to move Player in.
@@ -76,7 +82,7 @@ public class PlayerMovement : MovingObject
         // food--;
 
         //Call the AttemptMove method of the base class, passing in the component T (in this case Wall) and x and y direction to move.
-        base.isPlayerTurn = false;
+
         base.AttemptMove(xDir, yDir);
 
         //Hit allows us to reference the result of the Linecast done in Move.
@@ -85,7 +91,7 @@ public class PlayerMovement : MovingObject
         //If Move returns true, meaning Player was able to move into an empty space.
         // if (Move(xDir, yDir, out hit))
         // {
-            //Call RandomizeSfx of SoundManager to play the move sound, passing in two audio clips to choose from.
+        //Call RandomizeSfx of SoundManager to play the move sound, passing in two audio clips to choose from.
         // }
 
         //Since the player has moved and lost food points, check if the game has ended.
@@ -94,7 +100,6 @@ public class PlayerMovement : MovingObject
         //Set the playersTurn boolean of GameManager to false now that players turn is over.
         // base.isPlayerTurn = false;
     }
-
 
     //OnCantMove overrides the abstract function OnCantMove in MovingObject.
     //It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
@@ -112,39 +117,39 @@ public class PlayerMovement : MovingObject
 
 
     //OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        //Check if the tag of the trigger collided with is Exit.
-        if (other.CompareTag("Exit"))
-        {
-            //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
-            Invoke("Restart", restartLevelDelay);
+    // private void OnTriggerEnter2D(Collider2D other)
+    // {
+    //     //Check if the tag of the trigger collided with is Exit.
+    //     if (other.CompareTag("Exit"))
+    //     {
+    //         //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
+    //         Invoke("Restart", restartLevelDelay);
 
-            //Disable the player object since level is over.
-            enabled = false;
-        }
+    //         //Disable the player object since level is over.
+    //         enabled = false;
+    //     }
 
-        //Check if the tag of the trigger collided with is Food.
-        else if (other.CompareTag("Food"))
-        {
-            //Add pointsPerFood to the players current food total.
-            food += pointsPerFood;
+    //     //Check if the tag of the trigger collided with is Food.
+    //     else if (other.CompareTag("Food"))
+    //     {
+    //         //Add pointsPerFood to the players current food total.
+    //         food += pointsPerFood;
 
-            //Disable the food object the player collided with.
-            other.gameObject.SetActive(false);
-        }
+    //         //Disable the food object the player collided with.
+    //         other.gameObject.SetActive(false);
+    //     }
 
-        //Check if the tag of the trigger collided with is Soda.
-        else if (other.CompareTag("Soda"))
-        {
-            //Add pointsPerSoda to players food points total
-            food += pointsPerSoda;
+    //     //Check if the tag of the trigger collided with is Soda.
+    //     else if (other.CompareTag("Soda"))
+    //     {
+    //         //Add pointsPerSoda to players food points total
+    //         food += pointsPerSoda;
 
 
-            //Disable the soda object the player collided with.
-            other.gameObject.SetActive(false);
-        }
-    }
+    //         //Disable the soda object the player collided with.
+    //         other.gameObject.SetActive(false);
+    //     }
+    // }
 
 
     //Restart reloads the scene when called.
@@ -157,28 +162,28 @@ public class PlayerMovement : MovingObject
 
     //LoseFood is called when an enemy attacks the player.
     //It takes a parameter loss which specifies how many points to lose.
-    public void LoseFood(int loss)
-    {
-        //Set the trigger for the player animator to transition to the playerHit animation.
-        // animator.SetTrigger("playerHit");
+    // public void LoseFood(int loss)
+    // {
+    //     //Set the trigger for the player animator to transition to the playerHit animation.
+    //     // animator.SetTrigger("playerHit");
 
-        //Subtract lost food points from the players total.
-        food -= loss;
+    //     //Subtract lost food points from the players total.
+    //     food -= loss;
 
-        //Check to see if game has ended.
-        CheckIfGameOver();
-    }
+    //     //Check to see if game has ended.
+    //     CheckIfGameOver();
+    // }
 
 
-    //CheckIfGameOver checks if the player is out of food points and if so, ends the game.
-    private void CheckIfGameOver()
-    {
-        //Check if food point total is less than or equal to zero.
-        if (food <= 0)
-        {
+    // //CheckIfGameOver checks if the player is out of food points and if so, ends the game.
+    // private void CheckIfGameOver()
+    // {
+    //     //Check if food point total is less than or equal to zero.
+    //     if (food <= 0)
+    //     {
 
-            //Call the GameOver function of GameManager.
-            // GameManager.instance.GameOver();
-        }
-    }
+    //         //Call the GameOver function of GameManager.
+    //         // GameManager.instance.GameOver();
+    //     }
+    // }
 }
