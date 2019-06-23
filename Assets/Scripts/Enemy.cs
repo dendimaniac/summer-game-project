@@ -1,32 +1,41 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Enemy : MovingObject
 {
     public Transform player;
-    public PlayerPos moveRoute;
-    private bool isMoving = false;
-    private bool isDoneMoving = false;
-    private void Update()
+    private int currentIndex = 0;
+
+    protected override void Start()
     {
-        if (player.position == new Vector3(-4, 0, 0) && !isDoneMoving)
-        {
-            if (!isMoving)
-                StartCoroutine(toFollow());
-        }
+        GameManager.instance.AddEnemyToList(this);
+        base.Start();
     }
-    private IEnumerator toFollow()
+
+    public void moveEnemy()
     {
-        isMoving = true;
+        if (positionList.Count == 0)
+            return;
+        int xDir = 0;
+        int yDir = 0;
         Vector3 nextPos;
-        for (int i = 0; i < moveRoute.positionList.Count; i++)
+        nextPos = positionList[currentIndex + 1];
+        xDir = Mathf.RoundToInt(nextPos.x - positionList[currentIndex].x);
+        yDir = Mathf.RoundToInt(nextPos.y - positionList[currentIndex].y);
+        AttemptMove(xDir, yDir);
+        currentIndex++;
+        if (currentIndex == positionList.Count - 1)
         {
-            nextPos = new Vector3(moveRoute.positionList[i][0], moveRoute.positionList[i][1], moveRoute.positionList[i][2]);
-            if (i == moveRoute.positionList.Count - 1)  isDoneMoving = true;
-            yield return StartCoroutine(SmoothMovement(nextPos));
+            currentIndex = 0;
         }
-        isMoving = false;
     }
+
+    protected override void AttemptMove(int xDir, int yDir)
+    {
+        base.AttemptMove(xDir, yDir);
+    }
+
     protected override void OnCantMove<T>(T component)
     {
     }
