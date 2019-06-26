@@ -15,6 +15,14 @@ public class PlayerMovement : MovingObject
         base.Start();
     }
 
+    // protected void OnTriggerEnter2D(Collider2D other)
+    // {
+    //     if (other.gameObject.CompareTag("Enemy"))
+    //     {
+    //         Restart();
+    //     }
+    // }
+
     private void Update()
     {
         //If it's not the player's turn, exit the function.
@@ -31,6 +39,7 @@ public class PlayerMovement : MovingObject
             List<Vector3> clonePosList = new List<Vector3>(positionList);
             GameManager.instance.PassMoveRoute(clonePosList);
             positionList.Clear();
+            positionList.Add(transform.position);
         }
         int horizontal = 0;      //Used to store the horizontal move direction.
         int vertical = 0;        //Used to store the vertical move direction.
