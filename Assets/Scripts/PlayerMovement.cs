@@ -36,9 +36,7 @@ public class PlayerMovement : MovingObject
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            List<Vector3> clonePosList = new List<Vector3>(positionList);
-            GameManager.instance.PassMoveRoute(clonePosList);
-            positionList.Clear();
+            BeginNextTrack();
             positionList.Add(transform.position);
         }
         int horizontal = 0;      //Used to store the horizontal move direction.
@@ -62,6 +60,13 @@ public class PlayerMovement : MovingObject
             GameManager.instance.isPlayerTurn = false;
             AttemptMove(horizontal, vertical);
         }
+    }
+
+    private void BeginNextTrack()
+    {
+        List<Vector3> clonePosList = new List<Vector3>(positionList);
+        GameManager.instance.PassMoveRoute(clonePosList);
+        positionList.Clear();
     }
 
     //AttemptMove overrides the AttemptMove function in the base class MovingObject

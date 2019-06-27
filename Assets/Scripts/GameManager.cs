@@ -25,8 +25,10 @@ public class GameManager : MonoBehaviour
     {
         //Check that isPlayerTurn or isEnemyMoving or doingSetup are not currently true.
         if (isPlayerTurn || isEnemyMoving)
+        {
             //If any of these are true, return and do not start MoveEnemies.
             return;
+        }
 
         //Start moving enemies.
         StartCoroutine(MoveEnemies());
