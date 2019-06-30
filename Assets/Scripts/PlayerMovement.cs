@@ -28,17 +28,35 @@ public class PlayerMovement : MovingObject
         //If it's not the player's turn, exit the function.
         if (!GameManager.instance.isPlayerTurn) return;
 
+        SavePosition();
+
+        CheckNextTrack();
+
+        CheckMovement();
+    }
+
+    private void SavePosition()
+    {
         if (transform.position != lastPosition)
         {
             lastPosition = transform.position;
             positionList.Add(transform.position);
         }
+    }
 
+    private void CheckNextTrack()
+    {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            BeginNextTrack();
+            List<Vector3> clonePosList = new List<Vector3>(positionList);
+            GameManager.instance.PassMoveRoute(clonePosList);
+            positionList.Clear();
             positionList.Add(transform.position);
         }
+    }
+
+    private void CheckMovement()
+    {
         int horizontal = 0;      //Used to store the horizontal move direction.
         int vertical = 0;        //Used to store the vertical move direction.
 
@@ -60,13 +78,6 @@ public class PlayerMovement : MovingObject
             GameManager.instance.isPlayerTurn = false;
             AttemptMove(horizontal, vertical);
         }
-    }
-
-    private void BeginNextTrack()
-    {
-        List<Vector3> clonePosList = new List<Vector3>(positionList);
-        GameManager.instance.PassMoveRoute(clonePosList);
-        positionList.Clear();
     }
 
     //AttemptMove overrides the AttemptMove function in the base class MovingObject
