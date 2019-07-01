@@ -7,13 +7,10 @@ public abstract class MovingObject : MonoBehaviour
 {
     public float moveTime = 0.1f;            //Time it will take object to move, in seconds.
     public LayerMask blockingLayer;            //Layer on which collision will be checked.
-
-
     private CircleCollider2D cirCollider;         //The BoxCollider2D component attached to this object.
     private Rigidbody2D rb2D;                //The Rigidbody2D component attached to this object.
     private float inverseMoveTime;            //Used to make movement more efficient.
-    protected bool isPlayerTurn;
-
+    [HideInInspector]public List<Vector3> positionList = new List<Vector3>();
 
     //Protected, virtual functions can be overridden by inheriting classes.
     protected virtual void Start()
@@ -26,14 +23,11 @@ public abstract class MovingObject : MonoBehaviour
 
         //By storing the reciprocal of the move time we can use it by multiplying instead of dividing, this is more efficient.
         inverseMoveTime = 1f / moveTime;
-
-        isPlayerTurn = true;
     }
-
 
     //Move returns true if it is able to move and false if not. 
     //Move takes parameters for x direction, y direction and a RaycastHit2D to check collision.
-    protected bool Move(int xDir, int yDir, out RaycastHit2D hit)
+    protected void Move(int xDir, int yDir, out RaycastHit2D hit)
     {
         //Store start position to move from, based on objects current transform position.
         Vector2 start = transform.position;
@@ -56,14 +50,7 @@ public abstract class MovingObject : MonoBehaviour
         {
             //If nothing was hit, start SmoothMovement co-routine passing in the Vector2 end as destination
             StartCoroutine(SmoothMovement(end));
-
-            //Return true to say that Move was successful
-            return true;
         }
-
-        //If something was hit, return false, Move was unsuccesful.
-        isPlayerTurn = true;
-        return false;
     }
 
 
@@ -89,7 +76,6 @@ public abstract class MovingObject : MonoBehaviour
             //Return and loop until sqrRemainingDistance is close enough to zero to end the function
             yield return null;
         }
-        isPlayerTurn = true;
     }
 
 
@@ -100,22 +86,7 @@ public abstract class MovingObject : MonoBehaviour
         //Hit will store whatever our linecast hits when Move is called.
         RaycastHit2D hit;
 
-        //Set canMove to true if Move was successful, false if failed.
-        bool canMove = Move(xDir, yDir, out hit);
-
-        //Check if nothing was hit by linecast
-        if (hit.transform == null)
-            //If nothing was hit, return and don't execute further code.
-            return;
-
-        //Get a component reference to the component of type T attached to the object that was hit
-        // T hitComponent = hit.transform.GetComponent<T>();
-
-        //If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
-        // if (!canMove && hitComponent != null)
-
-            //Call the OnCantMove function and pass it hitComponent as a parameter.
-            // OnCantMove(hitComponent);
+        Move(xDir, yDir, out hit);
     }
 
 
