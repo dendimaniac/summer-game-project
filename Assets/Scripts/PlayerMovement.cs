@@ -7,12 +7,14 @@ using UnityEngine.SceneManagement;        //Allows us to use SceneManager
 public class PlayerMovement : MovingObject
 {
     private Vector3 lastPosition;
+    private bool canAddPos;
 
     //Start overrides the Start function of MovingObject
     protected override void Start()
     {
         //Call the Start function of the MovingObject base class.
         base.Start();
+        canAddPos = true;
     }
 
     // protected void OnTriggerEnter2D(Collider2D other)
@@ -37,7 +39,7 @@ public class PlayerMovement : MovingObject
 
     private void SavePosition()
     {
-        if (transform.position != lastPosition)
+        if (transform.position != lastPosition && canAddPos)
         {
             lastPosition = transform.position;
             positionList.Add(transform.position);
@@ -48,10 +50,15 @@ public class PlayerMovement : MovingObject
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            List<Vector3> clonePosList = new List<Vector3>(positionList);
-            GameManager.instance.PassMoveRoute(clonePosList);
-            positionList.Clear();
-            positionList.Add(transform.position);
+            if (canAddPos)
+            {
+                List<Vector3> clonePosList = new List<Vector3>(positionList);
+                GameManager.instance.PassMoveRoute(clonePosList);
+                positionList.Clear();
+                canAddPos = false;
+                return;
+            }
+            canAddPos = true;
         }
     }
 
